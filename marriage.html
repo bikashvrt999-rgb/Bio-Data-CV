@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>বিয়ের বায়োডাটা</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Hind+Siliguri:wght@400;500;600&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root { --purple: #7c3aed; --light-purple: #c084fc; --pink: #ec4899; --gold: #f59e0b; --dark: #0f0a1e; --card: #1a1030; --line: rgba(192,132,252,0.2); }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Hind Siliguri', sans-serif; background: var(--dark); color: white; min-height: 100vh; }
+
+    .topbar { background: rgba(124,58,237,0.15); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); padding: 14px 20px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; }
+    .back-btn { color: var(--light-purple); text-decoration: none; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+    .topbar-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: white; }
+    .btn-print { margin-left: auto; background: var(--purple); border: none; color: white; padding: 9px 18px; border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 0.82rem; font-weight: 600; cursor: pointer; }
+
+    /* Format toggle */
+    .format-bar { background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--line); padding: 12px 16px; position: sticky; top: 53px; z-index: 99; }
+    .format-row { display: flex; gap: 8px; max-width: 480px; margin: 0 auto; }
+    .fmt-btn { flex: 1; padding: 9px; border-radius: 10px; border: 1.5px solid var(--line); background: transparent; font-family: 'Poppins', sans-serif; font-size: 0.8rem; font-weight: 600; color: rgba(255,255,255,0.5); cursor: pointer; transition: all 0.2s; }
+    .fmt-btn.active { background: var(--purple); color: white; border-color: var(--purple); }
+
+    .main { padding: 16px; max-width: 480px; margin: 0 auto; }
+    #form-page { display: block; }
+    #cv-page { display: none; }
+
+    .section { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px 16px; margin-bottom: 14px; }
+    .sec-title { font-size: 0.82rem; font-weight: 600; color: var(--light-purple); margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 8px; font-family: 'Poppins', sans-serif; }
+
+    label { display: block; font-size: 0.72rem; font-weight: 500; color: rgba(255,255,255,0.45); margin-bottom: 4px; }
+    input, select, textarea { width: 100%; border: 1.5px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 11px 13px; font-family: 'Hind Siliguri', sans-serif; font-size: 0.88rem; color: white; background: rgba(255,255,255,0.05); margin-bottom: 12px; transition: border-color 0.2s; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--light-purple); background: rgba(192,132,252,0.08); }
+    select option { background: #1a1030; color: white; }
+    textarea { resize: none; height: 75px; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .photo-box { border: 2px dashed rgba(192,132,252,0.3); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; background: rgba(192,132,252,0.05); margin-bottom: 12px; transition: all 0.2s; }
+    .photo-box:hover { border-color: var(--light-purple); background: rgba(192,132,252,0.1); }
+    .photo-box p { font-size: 0.78rem; color: rgba(255,255,255,0.4); margin-top: 6px; }
+
+    .sig-canvas { border: 1.5px solid rgba(255,255,255,0.1); border-radius: 10px; width: 100%; touch-action: none; background: rgba(255,255,255,0.03); }
+    .sig-btns { display: flex; gap: 8px; margin-top: 8px; margin-bottom: 12px; }
+    .sig-btn { flex: 1; padding: 8px; border: 1.5px solid rgba(255,255,255,0.1); border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 0.75rem; font-weight: 600; cursor: pointer; background: transparent; color: rgba(255,255,255,0.5); }
+
+    .btn-gen { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--purple), var(--pink)); border: none; border-radius: 14px; font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 700; color: white; cursor: pointer; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(124,58,237,0.4); }
+
+    .cv-actions { display: flex; gap: 10px; margin-bottom: 16px; }
+    .btn-edit { flex: 1; padding: 11px; background: transparent; border: 1.5px solid var(--line); border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 0.85rem; font-weight: 600; color: rgba(255,255,255,0.7); cursor: pointer; }
+    .btn-dl { flex: 2; padding: 11px; background: var(--gold); border: none; border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 0.85rem; font-weight: 700; color: white; cursor: pointer; }
+
+    /* BIODATA PAPER */
+    .bio-paper { background: white; border-radius: 14px; overflow: hidden; color: #1a1a2e; }
+
+    .bio-top { background: linear-gradient(135deg, #4a0080, #7c3aed); padding: 24px 22px; color: white; position: relative; overflow: hidden; }
+    .bio-top::after { content: '💍'; position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 3rem; opacity: 0.2; }
+    .bio-header-row { display: flex; justify-content: space-between; align-items: flex-start; }
+    .bio-title-section h2 { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; }
+    .bio-title-section p { font-size: 0.75rem; color: rgba(255,255,255,0.7); margin-top: 4px; font-family: 'Hind Siliguri', sans-serif; }
+    .bio-photo { width: 80px; height: 95px; object-fit: cover; border-radius: 8px; border: 3px solid rgba(255,255,255,0.4); }
+    .bio-photo-placeholder { width: 80px; height: 95px; border-radius: 8px; border: 2px dashed rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: rgba(255,255,255,0.05); }
+
+    .bio-body { padding: 20px 22px; font-family: 'Hind Siliguri', sans-serif; }
+    .bio-sec { margin-bottom: 18px; }
+    .bio-sec-title { font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; color: #7c3aed; border-bottom: 2px solid #ede9fe; padding-bottom: 5px; margin-bottom: 12px; font-family: 'Poppins', sans-serif; }
+    .bio-table { width: 100%; border-collapse: collapse; }
+    .bio-table td { padding: 5px 6px; font-size: 0.82rem; vertical-align: top; }
+    .bio-table td:first-child { font-weight: 600; color: #4a0080; width: 42%; white-space: nowrap; }
+    .bio-table td:nth-child(2) { color: #6b7280; width: 5%; }
+    .bio-table td:last-child { color: #1e293b; }
+    .bio-table tr:nth-child(even) td { background: #faf5ff; }
+
+    .bio-sign { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid #ede9fe; font-size: 0.78rem; color: #6b7280; font-family: 'Hind Siliguri', sans-serif; }
+    .bio-sig-img { max-height: 40px; }
+
+    @media print {
+      .topbar, .format-bar, .cv-actions, #form-page { display: none !important; }
+      #cv-page { display: block !important; }
+      .main { padding: 0; max-width: 100%; }
+      .bio-paper { border-radius: 0; }
+      body { background: white; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="back-btn">← ফিরে যাও</a>
+  <div class="topbar-title">💍 বিয়ের বায়োডাটা</div>
+  <button class="btn-print" onclick="window.print()">⬇️ PDF</button>
+</div>
+
+<div class="format-bar">
+  <div class="format-row">
+    <button class="fmt-btn active" id="btn-bn" onclick="setFmt('bn')">বাংলা Format</button>
+    <button class="fmt-btn" id="btn-en" onclick="setFmt('en')">English Format</button>
+  </div>
+</div>
+
+<div class="main">
+  <div id="form-page">
+
+    <div class="section">
+      <div class="sec-title">👤 ব্যক্তিগত তথ্য</div>
+      <label>পুরো নাম *</label>
+      <input id="name" placeholder="যেমন: Priya Das / প্রিয়া দাস"/>
+      <div class="row2">
+        <div><label>জন্ম তারিখ</label><input id="dob" placeholder="01/01/2000"/></div>
+        <div><label>বয়স</label><input id="age" placeholder="24"/></div>
+      </div>
+      <div class="row2">
+        <div>
+          <label>পাত্র / পাত্রী</label>
+          <select id="gender">
+            <option value="পাত্রী">পাত্রী (Bride)</option>
+            <option value="পাত্র">পাত্র (Groom)</option>
+          </select>
+        </div>
+        <div>
+          <label>উচ্চতা</label>
+          <input id="height" placeholder="5'4&quot; / 163 cm"/>
+        </div>
+      </div>
+      <div class="row2">
+        <div><label>গায়ের রঙ</label><input id="complexion" placeholder="ফর্সা / শ্যামলা"/></div>
+        <div><label>শারীরিক গড়ন</label><input id="build" placeholder="মাঝারি / slim"/></div>
+      </div>
+      <div class="row2">
+        <div>
+          <label>ধর্ম</label>
+          <select id="religion">
+            <option value="">-- বেছে নাও --</option>
+            <option value="হিন্দু">হিন্দু / Hindu</option>
+            <option value="মুসলিম">মুসলিম / Muslim</option>
+            <option value="খ্রিষ্টান">খ্রিষ্টান / Christian</option>
+          </select>
+        </div>
+        <div>
+          <label>জাতি</label>
+          <select id="caste">
+            <option value="">-- বেছে নাও --</option>
+            <option value="General">General</option>
+            <option value="OBC-A">OBC-A</option>
+            <option value="OBC-B">OBC-B</option>
+            <option value="SC">SC</option>
+            <option value="ST">ST</option>
+          </select>
+        </div>
+      </div>
+      <label>গোত্র (থাকলে)</label>
+      <input id="gotra" placeholder="যেমন: কাশ্যপ, ভরদ্বাজ..."/>
+      <label>রাশি / জন্ম নক্ষত্র (থাকলে)</label>
+      <input id="rashi" placeholder="যেমন: মেষ, রোহিণী নক্ষত্র"/>
+      <label>বর্তমান ঠিকানা *</label>
+      <input id="address" placeholder="যেমন: Barasat, North 24 Parganas, WB"/>
+      <label>স্থায়ী ঠিকানা (আলাদা হলে)</label>
+      <input id="permanent-address" placeholder="যেমন: Nadia, WB"/>
+    </div>
+
+    <div class="section">
+      <div class="sec-title">🎓 শিক্ষা ও পেশা</div>
+      <label>সর্বোচ্চ শিক্ষাগত যোগ্যতা</label>
+      <input id="education" placeholder="যেমন: BA (Bengali), Barasat College, 2023"/>
+      <label>পেশা / কাজ</label>
+      <input id="occupation" placeholder="যেমন: Private Job, গৃহিণী, Student"/>
+      <label>মাসিক আয় (ঐচ্ছিক)</label>
+      <input id="income" placeholder="যেমন: ₹15,000 / মাস"/>
+    </div>
+
+    <div class="section">
+      <div class="sec-title">👨‍👩‍👧 পারিবারিক তথ্য</div>
+      <label>বাবার নাম ও পেশা</label>
+      <input id="father" placeholder="যেমন: Suresh Das, ব্যবসায়ী"/>
+      <label>মায়ের নাম ও পেশা</label>
+      <input id="mother" placeholder="যেমন: Sunita Das, গৃহিণী"/>
+      <label>ভাই / বোন</label>
+      <input id="siblings" placeholder="যেমন: ১ ভাই (বিবাহিত), ১ বোন (অবিবাহিত)"/>
+      <label>পারিবারিক অবস্থা</label>
+      <select id="family-status">
+        <option value="">-- বেছে নাও --</option>
+        <option value="মধ্যবিত্ত">মধ্যবিত্ত / Middle Class</option>
+        <option value="উচ্চ মধ্যবিত্ত">উচ্চ মধ্যবিত্ত / Upper Middle Class</option>
+        <option value="উচ্চবিত্ত">উচ্চবিত্ত / Upper Class</option>
+      </select>
+    </div>
+
+    <div class="section">
+      <div class="sec-title">📱 যোগাযোগ</div>
+      <label>মোবাইল নম্বর *</label>
+      <input id="phone" placeholder="98765 43210" type="tel"/>
+      <label>বিকল্প নম্বর / বাবার নম্বর</label>
+      <input id="alt-phone" placeholder="97654 32109" type="tel"/>
+      <label>Email (ঐচ্ছিক)</label>
+      <input id="email" placeholder="priya@gmail.com"/>
+    </div>
+
+    <div class="section">
+      <div class="sec-title">💭 পাত্র/পাত্রী সম্পর্কে প্রত্যাশা</div>
+      <textarea id="expectation" placeholder="পাত্র বা পাত্রী সম্পর্কে তোমার প্রত্যাশা লিখো... যেমন: শিক্ষিত, কর্মজীবী, একই ধর্মের ইত্যাদি"></textarea>
+    </div>
+
+    <div class="section">
+      <div class="sec-title">📸 ছবি</div>
+      <div class="photo-box" onclick="document.getElementById('photo-input').click()">
+        <div id="photo-preview"><div style="font-size:2rem">📷</div><p>ছবি আপলোড করো (ক্লিক করো)</p></div>
+        <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="loadPhoto(this)"/>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="sec-title">✍️ স্বাক্ষর</div>
+      <p style="font-size:0.75rem;color:rgba(255,255,255,0.4);margin-bottom:10px">আঙুল দিয়ে স্বাক্ষর করো</p>
+      <canvas id="sig-canvas" class="sig-canvas" height="90"></canvas>
+      <div class="sig-btns">
+        <button class="sig-btn" onclick="clearSig()" style="color:#f87171;border-color:rgba(248,113,113,0.3)">🗑️ মুছো</button>
+        <button class="sig-btn" onclick="saveSig()" style="color:#34d399;border-color:rgba(52,211,153,0.3)">✅ সেভ করো</button>
+      </div>
+    </div>
+
+    <button class="btn-gen" onclick="generateBiodata()">✅ বায়োডাটা দেখো</button>
+  </div>
+
+  <div id="cv-page">
+    <div class="cv-actions">
+      <button class="btn-edit" onclick="editCV()">✏️ Edit</button>
+      <button class="btn-dl" onclick="window.print()">⬇️ PDF Download</button>
+    </div>
+    <div class="bio-paper" id="bio-output"></div>
+  </div>
+</div>
+
+<script>
+  let photoData = null, sigData = null, isDrawing = false, lastX = 0, lastY = 0;
+  let currentFmt = 'bn';
+
+  function setFmt(fmt) {
+    currentFmt = fmt;
+    document.getElementById('btn-bn').className = 'fmt-btn' + (fmt === 'bn' ? ' active' : '');
+    document.getElementById('btn-en').className = 'fmt-btn' + (fmt === 'en' ? ' active' : '');
+  }
+
+  function loadPhoto(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      photoData = e.target.result;
+      document.getElementById('photo-preview').innerHTML = `<img src="${photoData}" style="width:90px;height:110px;object-fit:cover;border-radius:8px"/>`;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  window.addEventListener('load', () => {
+    const canvas = document.getElementById('sig-canvas');
+    if (!canvas) return;
+    canvas.width = canvas.offsetWidth;
+    const ctx = canvas.getContext('2d');
+    ctx.strokeStyle = '#4a0080'; ctx.lineWidth = 2; ctx.lineCap = 'round';
+    const getPos = e => { const r = canvas.getBoundingClientRect(), t = e.touches ? e.touches[0] : e; return {x: t.clientX-r.left, y: t.clientY-r.top}; };
+    canvas.addEventListener('mousedown', e => { isDrawing=true; const p=getPos(e); lastX=p.x; lastY=p.y; });
+    canvas.addEventListener('mousemove', e => { if(!isDrawing) return; const p=getPos(e); ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(p.x,p.y); ctx.stroke(); lastX=p.x; lastY=p.y; });
+    canvas.addEventListener('mouseup', () => isDrawing=false);
+    canvas.addEventListener('touchstart', e => { e.preventDefault(); isDrawing=true; const p=getPos(e); lastX=p.x; lastY=p.y; }, {passive:false});
+    canvas.addEventListener('touchmove', e => { e.preventDefault(); if(!isDrawing) return; const p=getPos(e); ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(p.x,p.y); ctx.stroke(); lastX=p.x; lastY=p.y; }, {passive:false});
+    canvas.addEventListener('touchend', () => isDrawing=false);
+  });
+
+  function clearSig() { const c=document.getElementById('sig-canvas'); c.getContext('2d').clearRect(0,0,c.width,c.height); sigData=null; }
+  function saveSig() { sigData=document.getElementById('sig-canvas').toDataURL(); alert('✅ স্বাক্ষর সেভ!'); }
+
+  function generateBiodata() {
+    const name = document.getElementById('name').value.trim();
+    if (!name) { alert('নাম দিতে ভুলে গেছো!'); return; }
+
+    const isBn = currentFmt === 'bn';
+    const val = id => document.getElementById(id).value;
+    const today = new Date().toLocaleDateString('en-IN');
+
+    const labels = isBn ? {
+      dob: 'জন্ম তারিখ', age: 'বয়স', height: 'উচ্চতা', complexion: 'গায়ের রঙ',
+      build: 'শারীরিক গড়ন', religion: 'ধর্ম', caste: 'জাতি', gotra: 'গোত্র',
+      rashi: 'রাশি/নক্ষত্র', address: 'বর্তমান ঠিকানা', permAddr: 'স্থায়ী ঠিকানা',
+      education: 'শিক্ষাগত যোগ্যতা', occupation: 'পেশা', income: 'মাসিক আয়',
+      father: 'পিতার নাম ও পেশা', mother: 'মাতার নাম ও পেশা', siblings: 'ভাই/বোন',
+      familyStatus: 'পারিবারিক অবস্থা', phone: 'মোবাইল', altPhone: 'বিকল্প নম্বর',
+      email: 'Email', expectation: 'প্রত্যাশা',
+      secPersonal: 'ব্যক্তিগত তথ্য', secEdu: 'শিক্ষা ও পেশা',
+      secFamily: 'পারিবারিক তথ্য', secContact: 'যোগাযোগ', secExpect: 'পাত্র/পাত্রী প্রত্যাশা',
+      secDecl: 'ঘোষণাপত্র', declText: 'আমি ঘোষণা করছি যে উপরের সমস্ত তথ্য সত্য ও সঠিক।',
+      dateLabel: 'তারিখ', sigLabel: 'স্বাক্ষর'
+    } : {
+      dob: 'Date of Birth', age: 'Age', height: 'Height', complexion: 'Complexion',
+      build: 'Body Type', religion: 'Religion', caste: 'Caste', gotra: 'Gotra',
+      rashi: 'Rashi/Nakshatra', address: 'Current Address', permAddr: 'Permanent Address',
+      education: 'Education', occupation: 'Occupation', income: 'Monthly Income',
+      father: 'Father\'s Name & Occupation', mother: 'Mother\'s Name & Occupation', siblings: 'Siblings',
+      familyStatus: 'Family Status', phone: 'Mobile', altPhone: 'Alternate Phone',
+      email: 'Email', expectation: 'Partner Expectation',
+      secPersonal: 'Personal Information', secEdu: 'Education & Profession',
+      secFamily: 'Family Information', secContact: 'Contact Details', secExpect: 'Partner Expectation',
+      secDecl: 'Declaration', declText: 'I hereby declare that all the information provided above is true and correct.',
+      dateLabel: 'Date', sigLabel: 'Signature'
+    };
+
+    const gender = val('gender');
+    const biodataTitle = isBn 
+      ? (gender === 'পাত্রী' ? 'পাত্রীর বায়োডাটা' : 'পাত্রের বায়োডাটা')
+      : (gender === 'পাত্রী' ? 'Bride\'s Biodata' : 'Groom\'s Biodata');
+
+    const makeRows = (pairs) => pairs.filter(p=>p[1]).map(p=>`<tr><td>${p[0]}</td><td>:</td><td>${p[1]}</td></tr>`).join('');
+
+    const personalRows = makeRows([
+      [labels.dob, val('dob')], [labels.age, val('age') ? val('age')+(isBn?' বছর':' Years') : ''],
+      [labels.height, val('height')], [labels.complexion, val('complexion')],
+      [labels.build, val('build')], [labels.religion, val('religion')],
+      [labels.caste, val('caste')], [labels.gotra, val('gotra')],
+      [labels.rashi, val('rashi')], [labels.address, val('address')],
+      [labels.permAddr, val('permanent-address')]
+    ]);
+
+    const eduRows = makeRows([
+      [labels.education, val('education')], [labels.occupation, val('occupation')],
+      [labels.income, val('income')]
+    ]);
+
+    const familyRows = makeRows([
+      [labels.father, val('father')], [labels.mother, val('mother')],
+      [labels.siblings, val('siblings')], [labels.familyStatus, val('family-status')]
+    ]);
+
+    const contactRows = makeRows([
+      [labels.phone, val('phone')], [labels.altPhone, val('alt-phone')],
+      [labels.email, val('email')]
+    ]);
+
+    document.getElementById('bio-output').innerHTML = `
+      <div class="bio-top">
+        <div class="bio-header-row">
+          <div class="bio-title-section">
+            <h2>${name}</h2>
+            <p>${biodataTitle}</p>
+          </div>
+          ${photoData ? `<img class="bio-photo" src="${photoData}"/>` : '<div class="bio-photo-placeholder">👤</div>'}
+        </div>
+      </div>
+      <div class="bio-body">
+        <div class="bio-sec">
+          <div class="bio-sec-title">${labels.secPersonal}</div>
+          <table class="bio-table">${personalRows || '<tr><td colspan="3" style="color:#ccc;font-size:0.8rem">তথ্য যোগ করো</td></tr>'}</table>
+        </div>
+        ${eduRows ? `<div class="bio-sec"><div class="bio-sec-title">${labels.secEdu}</div><table class="bio-table">${eduRows}</table></div>` : ''}
+        ${familyRows ? `<div class="bio-sec"><div class="bio-sec-title">${labels.secFamily}</div><table class="bio-table">${familyRows}</table></div>` : ''}
+        ${contactRows ? `<div class="bio-sec"><div class="bio-sec-title">${labels.secContact}</div><table class="bio-table">${contactRows}</table></div>` : ''}
+        ${val('expectation') ? `<div class="bio-sec"><div class="bio-sec-title">${labels.secExpect}</div><p style="font-size:0.82rem;color:#475569;line-height:1.7">${val('expectation')}</p></div>` : ''}
+        <div class="bio-sec" style="margin-bottom:0">
+          <div class="bio-sec-title">${labels.secDecl}</div>
+          <p style="font-size:0.8rem;color:#475569;line-height:1.7">${labels.declText}</p>
+          <div class="bio-sign">
+            <div>${labels.dateLabel}: ${today}</div>
+            <div>${sigData ? `<img class="bio-sig-img" src="${sigData}"/>` : labels.sigLabel+': ___________'}</div>
+          </div>
+        </div>
+      </div>`;
+
+    document.getElementById('form-page').style.display = 'none';
+    document.getElementById('cv-page').style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+
+  function editCV() {
+    document.getElementById('form-page').style.display = 'block';
+    document.getElementById('cv-page').style.display = 'none';
+    window.scrollTo(0, 0);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Professional CV Builder</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root { --gold: #d4a017; --dark: #0a0f1e; --card: #111827; --line: rgba(212,160,23,0.2); --blue: #1d4ed8; --sky: #38bdf8; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: white; min-height: 100vh; }
+
+    .topbar { background: rgba(212,160,23,0.1); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); padding: 14px 20px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; }
+    .back-btn { color: var(--gold); text-decoration: none; font-size: 0.85rem; font-weight: 600; }
+    .topbar-title { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; }
+    .btn-print { margin-left: auto; background: var(--gold); border: none; color: #0a0f1e; padding: 9px 18px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 700; cursor: pointer; }
+
+    .main { padding: 16px; max-width: 480px; margin: 0 auto; }
+    #form-page { display: block; }
+    #cv-page { display: none; }
+
+    .section { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px 16px; margin-bottom: 14px; }
+    .sec-title { font-size: 0.8rem; font-weight: 600; color: var(--gold); margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px; font-family: 'DM Sans', sans-serif; }
+
+    label { display: block; font-size: 0.72rem; font-weight: 500; color: rgba(255,255,255,0.4); margin-bottom: 4px; letter-spacing: 0.3px; }
+    input, textarea, select { width: 100%; border: 1.5px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 11px 13px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; color: white; background: rgba(255,255,255,0.04); margin-bottom: 12px; transition: border-color 0.2s; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--gold); background: rgba(212,160,23,0.05); }
+    select option { background: #111827; }
+    textarea { resize: none; min-height: 80px; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .entry-block { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 14px; margin-bottom: 10px; position: relative; }
+    .entry-num { font-size: 0.7rem; color: var(--gold); font-weight: 600; margin-bottom: 10px; }
+    .btn-remove { position: absolute; top: 10px; right: 10px; background: rgba(248,113,113,0.15); border: none; border-radius: 6px; padding: 3px 8px; font-size: 0.72rem; cursor: pointer; color: #f87171; font-weight: 600; }
+    .btn-add { width: 100%; border: 1.5px dashed rgba(255,255,255,0.15); background: transparent; border-radius: 10px; padding: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.83rem; color: rgba(255,255,255,0.4); cursor: pointer; margin-bottom: 12px; transition: all 0.2s; font-weight: 500; }
+    .btn-add:hover { border-color: var(--gold); color: var(--gold); }
+
+    .skill-row { display: flex; gap: 8px; margin-bottom: 8px; }
+    .skill-row input { margin-bottom: 0; }
+    .btn-add-skill { background: var(--gold); border: none; border-radius: 10px; color: #0a0f1e; font-size: 1.1rem; width: 42px; flex-shrink: 0; cursor: pointer; font-weight: 700; }
+    .skill-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .skill-tag { background: rgba(212,160,23,0.15); color: var(--gold); border: 1px solid rgba(212,160,23,0.3); border-radius: 20px; padding: 4px 12px; font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+    .skill-tag button { background: none; border: none; color: rgba(212,160,23,0.5); cursor: pointer; }
+
+    .btn-gen { width: 100%; padding: 15px; background: linear-gradient(135deg, #1d4ed8, #0891b2); border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 700; color: white; cursor: pointer; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(29,78,216,0.4); }
+
+    .cv-actions { display: flex; gap: 10px; margin-bottom: 16px; }
+    .btn-edit { flex: 1; padding: 11px; background: transparent; border: 1.5px solid var(--line); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600; color: rgba(255,255,255,0.6); cursor: pointer; }
+    .btn-dl { flex: 2; padding: 11px; background: var(--gold); border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 700; color: #0a0f1e; cursor: pointer; }
+
+    /* PRO CV PAPER */
+    .cv-paper { background: white; border-radius: 14px; overflow: hidden; color: #1e293b; box-shadow: 0 8px 40px rgba(0,0,0,0.3); }
+
+    .cv-top { background: #0f172a; padding: 30px 28px; color: white; position: relative; overflow: hidden; }
+    .cv-top::before { content: ''; position: absolute; top: -30px; right: -30px; width: 150px; height: 150px; border-radius: 50%; background: rgba(212,160,23,0.08); }
+    .cv-top::after { content: ''; position: absolute; bottom: -20px; left: -20px; width: 100px; height: 100px; border-radius: 50%; background: rgba(29,78,216,0.08); }
+    .cv-name { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 700; line-height: 1; }
+    .cv-role { color: var(--gold); font-size: 0.85rem; font-weight: 500; margin-top: 5px; letter-spacing: 1px; text-transform: uppercase; }
+    .cv-contacts { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 14px; }
+    .cv-contact { font-size: 0.75rem; color: rgba(255,255,255,0.65); display: flex; align-items: center; gap: 4px; }
+
+    .cv-body { display: grid; grid-template-columns: 1fr 200px; }
+    .cv-main { padding: 22px 24px; border-right: 1px solid #f1f5f9; }
+    .cv-side { padding: 22px 18px; background: #f8fafc; }
+
+    .cv-sec { margin-bottom: 20px; }
+    .cv-sec-title { font-size: 0.6rem; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: #1d4ed8; border-bottom: 2px solid #dbeafe; padding-bottom: 5px; margin-bottom: 12px; font-family: 'DM Sans', sans-serif; }
+
+    .cv-summary { font-size: 0.82rem; line-height: 1.7; color: #475569; }
+
+    .cv-entry { margin-bottom: 14px; }
+    .cv-entry-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2px; }
+    .cv-entry-title { font-size: 0.9rem; font-weight: 700; color: #0f172a; }
+    .cv-entry-date { font-size: 0.7rem; background: #dbeafe; color: #1d4ed8; padding: 2px 8px; border-radius: 8px; font-weight: 600; white-space: nowrap; }
+    .cv-entry-sub { font-size: 0.78rem; color: #64748b; margin-bottom: 4px; }
+    .cv-entry-desc { font-size: 0.78rem; line-height: 1.6; color: #64748b; }
+
+    .cv-skills { display: flex; flex-wrap: wrap; gap: 5px; }
+    .cv-skill { background: #f0f9ff; color: #0369a1; font-size: 0.72rem; padding: 3px 9px; border-radius: 20px; font-weight: 600; border: 1px solid #bae6fd; }
+
+    .cv-side-sec { margin-bottom: 18px; }
+    .cv-side-title { font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; color: var(--gold); margin-bottom: 10px; padding-bottom: 4px; border-bottom: 1.5px solid #fef3c7; }
+    .cv-side-text { font-size: 0.78rem; color: #475569; line-height: 1.6; }
+    .cv-side-item { font-size: 0.78rem; color: #475569; margin-bottom: 5px; display: flex; gap: 5px; }
+    .cv-side-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--gold); margin-top: 6px; flex-shrink: 0; }
+
+    .cv-sign { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 16px; padding-top: 12px; border-top: 1px solid #f1f5f9; font-size: 0.75rem; color: #94a3b8; }
+    .cv-sig-img { max-height: 35px; }
+
+    @media print {
+      .topbar, .cv-actions, #form-page { display: none !important; }
+      #cv-page { display: block !important; }
+      .main { padding: 0; max-width: 100%; }
+      .cv-paper { border-radius: 0; box-shadow: none; }
+      body { background: white; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="back-btn">← Back</a>
+  <div class="topbar-title">🏢 Professional CV Builder</div>
+  <button class="btn-print" onclick="window.print()">⬇️ PDF</button>
+</div>
+
+<div class="main">
+  <div id="form-page">
+
+    <div class="section">
+      <div class="sec-title">👤 PERSONAL INFO</div>
+      <label>Full Name *</label>
+      <input id="name" placeholder="Arjun Chatterjee"/>
+      <label>Job Title / Desired Role</label>
+      <input id="role" placeholder="Software Engineer / Marketing Executive"/>
+      <label>Email *</label>
+      <input id="email" placeholder="arjun@gmail.com"/>
+      <div class="row2">
+        <div><label>Phone *</label><input id="phone" placeholder="+91 98765 43210"/></div>
+        <div><label>City</label><input id="city" placeholder="Kolkata, WB"/></div>
+      </div>
+      <label>LinkedIn</label>
+      <input id="linkedin" placeholder="linkedin.com/in/arjun"/>
+      <label>GitHub / Portfolio (optional)</label>
+      <input id="github" placeholder="github.com/arjun"/>
+    </div>
+
+    <div class="section">
+      <div class="sec-title">🎯 PROFESSIONAL SUMMARY</div>
+      <textarea id="summary" placeholder="Write 2-3 lines about your experience, skills, and career goals..."></textarea>
+    </div>
+
+    <div class="section">
+      <div class="sec-title">💼 WORK EXPERIENCE</div>
+      <div id="exp-list"></div>
+      <button class="btn-add" onclick="addExp()">+ Add Experience</button>
+    </div>
+
+    <div class="section">
+      <div class="sec-title">🎓 EDUCATION</div>
+      <div id="edu-list"></div>
+      <button class="btn-add" onclick="addEdu()">+ Add Education</button>
+    </div>
+
+    <div class="section">
+      <div class="sec-title">💻 PROJECTS</div>
+      <div id="proj-list"></div>
+      <button class="btn-add" onclick="addProj()">+ Add Project</button>
+    </div>
+
+    <div class="section">
+      <div class="sec-title">⚡ SKILLS</div>
+      <label>Add Skills</label>
+      <div class="skill-row">
+        <input id="skill-input" placeholder="Python, React, Excel..." onkeydown="if(event.key==='Enter'){addSkill();event.preventDefault()}"/>
+        <button class="btn-add-skill" onclick="addSkill()">+</button>
+      </div>
+      <div class="skill-tags" id="skill-tags"></div>
+    </div>
+
+    <div class="section">
+      <div class="sec-title">🏆 ACHIEVEMENTS & CERTIFICATIONS</div>
+      <label>Achievements (one per line)</label>
+      <textarea id="achievements" placeholder="Best Employee Award 2023&#10;Google Analytics Certified&#10;Published research paper in..."></textarea>
+    </div>
+
+    <div class="section">
+      <div class="sec-title">🌐 LANGUAGES</div>
+      <input id="languages" placeholder="Bengali (Native), Hindi (Fluent), English (Professional)"/>
+    </div>
+
+    <button class="btn-gen" onclick="generateProCV()">✅ Preview Professional CV</button>
+  </div>
+
+  <div id="cv-page">
+    <div class="cv-actions">
+      <button class="btn-edit" onclick="editCV()">✏️ Edit</button>
+      <button class="btn-dl" onclick="window.print()">⬇️ Download PDF</button>
+    </div>
+    <div class="cv-paper" id="cv-output"></div>
+  </div>
+</div>
+
+<script>
+  let skills = [], expData = [], eduData = [], projData = [];
+  let expCount = 0, eduCount = 0, projCount = 0;
+
+  function addSkill() {
+    const input = document.getElementById('skill-input');
+    const val = input.value.trim();
+    if (!val) return;
+    skills.push(val); input.value = '';
+    renderSkills();
+  }
+  function removeSkill(i) { skills.splice(i, 1); renderSkills(); }
+  function renderSkills() {
+    document.getElementById('skill-tags').innerHTML = skills.map((s,i) =>
+      `<div class="skill-tag">${s}<button onclick="removeSkill(${i})">✕</button></div>`).join('');
+  }
+
+  function addExp() {
+    const id = ++expCount; expData.push({id});
+    const div = document.createElement('div');
+    div.className = 'entry-block'; div.id = `exp-${id}`;
+    div.innerHTML = `<div class="entry-num">Experience #${id}</div>
+      <button class="btn-remove" onclick="removeExp(${id})">Remove</button>
+      <label>Job Title</label><input placeholder="Software Engineer" oninput="setExp(${id},'title',this.value)"/>
+      <label>Company</label><input placeholder="TCS, Infosys, Wipro..." oninput="setExp(${id},'company',this.value)"/>
+      <div class="row2">
+        <div><label>Start</label><input placeholder="Jan 2022" oninput="setExp(${id},'start',this.value)"/></div>
+        <div><label>End</label><input placeholder="Present" oninput="setExp(${id},'end',this.value)"/></div>
+      </div>
+      <label>Key Responsibilities</label><textarea placeholder="What did you do? Key achievements..." oninput="setExp(${id},'desc',this.value)"></textarea>`;
+    document.getElementById('exp-list').appendChild(div);
+  }
+  function removeExp(id) { expData = expData.filter(e=>e.id!==id); document.getElementById(`exp-${id}`).remove(); }
+  function setExp(id, key, val) { const e = expData.find(x=>x.id===id); if(e) e[key]=val; }
+
+  function addEdu() {
+    const id = ++eduCount; eduData.push({id});
+    const div = document.createElement('div');
+    div.className = 'entry-block'; div.id = `edu-${id}`;
+    div.innerHTML = `<div class="entry-num">Education #${id}</div>
+      <button class="btn-remove" onclick="removeEdu(${id})">Remove</button>
+      <label>Degree</label><input placeholder="B.Tech Computer Science" oninput="setEdu(${id},'degree',this.value)"/>
+      <label>Institution</label><input placeholder="Jadavpur University" oninput="setEdu(${id},'inst',this.value)"/>
+      <div class="row2">
+        <div><label>Year</label><input placeholder="2023" oninput="setEdu(${id},'year',this.value)"/></div>
+        <div><label>Grade/CGPA</label><input placeholder="8.5 CGPA" oninput="setEdu(${id},'grade',this.value)"/></div>
+      </div>`;
+    document.getElementById('edu-list').appendChild(div);
+  }
+  function removeEdu(id) { eduData = eduData.filter(e=>e.id!==id); document.getElementById(`edu-${id}`).remove(); }
+  function setEdu(id, key, val) { const e = eduData.find(x=>x.id===id); if(e) e[key]=val; }
+
+  function addProj() {
+    const id = ++projCount; projData.push({id});
+    const div = document.createElement('div');
+    div.className = 'entry-block'; div.id = `proj-${id}`;
+    div.innerHTML = `<div class="entry-num">Project #${id}</div>
+      <button class="btn-remove" onclick="removeProj(${id})">Remove</button>
+      <label>Project Name</label><input placeholder="E-Commerce Platform" oninput="setProj(${id},'name',this.value)"/>
+      <label>Tech Stack</label><input placeholder="React, Node.js, MongoDB" oninput="setProj(${id},'tech',this.value)"/>
+      <label>Description</label><textarea placeholder="What does it do? Your role?" oninput="setProj(${id},'desc',this.value)"></textarea>`;
+    document.getElementById('proj-list').appendChild(div);
+  }
+  function removeProj(id) { projData = projData.filter(e=>e.id!==id); document.getElementById(`proj-${id}`).remove(); }
+  function setProj(id, key, val) { const e = projData.find(x=>x.id===id); if(e) e[key]=val; }
+
+  function generateProCV() {
+    const name = document.getElementById('name').value.trim();
+    if (!name) { alert('Please enter your name!'); return; }
+
+    const role = document.getElementById('role').value;
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
+    const city = document.getElementById('city').value;
+    const linkedin = document.getElementById('linkedin').value;
+    const github = document.getElementById('github').value;
+    const summary = document.getElementById('summary').value;
+    const achievements = document.getElementById('achievements').value;
+    const languages = document.getElementById('languages').value;
+    const today = new Date().toLocaleDateString('en-IN');
+
+    let contacts = '';
+    if (email) contacts += `<div class="cv-contact">📧 ${email}</div>`;
+    if (phone) contacts += `<div class="cv-contact">📱 ${phone}</div>`;
+    if (city) contacts += `<div class="cv-contact">📍 ${city}</div>`;
+    if (linkedin) contacts += `<div class="cv-contact">🔗 ${linkedin}</div>`;
+    if (github) contacts += `<div class="cv-contact">💻 ${github}</div>`;
+
+    const expHTML = expData.length ? expData.map(e => `
+      <div class="cv-entry">
+        <div class="cv-entry-top">
+          <div class="cv-entry-title">${e.title||'Job Title'}</div>
+          <div class="cv-entry-date">${e.start||''} ${e.end?'– '+e.end:''}</div>
+        </div>
+        <div class="cv-entry-sub">${e.company||'Company'}</div>
+        ${e.desc?`<div class="cv-entry-desc">${e.desc}</div>`:''}
+      </div>`).join('') : '';
+
+    const eduHTML = eduData.length ? eduData.map(e => `
+      <div class="cv-entry">
+        <div class="cv-entry-top">
+          <div class="cv-entry-title">${e.degree||'Degree'}</div>
+          <div class="cv-entry-date">${e.year||''}</div>
+        </div>
+        <div class="cv-entry-sub">${e.inst||'Institution'} ${e.grade?`· ${e.grade}`:''}</div>
+      </div>`).join('') : '';
+
+    const projHTML = projData.length ? projData.map(e => `
+      <div class="cv-entry">
+        <div class="cv-entry-title">💻 ${e.name||'Project'}</div>
+        ${e.tech?`<div class="cv-entry-sub">🛠 ${e.tech}</div>`:''}
+        ${e.desc?`<div class="cv-entry-desc">${e.desc}</div>`:''}
+      </div>`).join('') : '';
+
+    const achHTML = achievements ? achievements.split('\n').filter(Boolean).map(a =>
+      `<div class="cv-side-item"><div class="cv-side-dot"></div><div>${a}</div></div>`).join('') : '';
+
+    document.getElementById('cv-output').innerHTML = `
+      <div class="cv-top">
+        <div class="cv-name">${name}</div>
+        ${role ? `<div class="cv-role">${role}</div>` : ''}
+        <div class="cv-contacts">${contacts}</div>
+      </div>
+      <div class="cv-body">
+        <div class="cv-main">
+          ${summary ? `<div class="cv-sec"><div class="cv-sec-title">Professional Summary</div><div class="cv-summary">${summary}</div></div>` : ''}
+          ${expHTML ? `<div class="cv-sec"><div class="cv-sec-title">Work Experience</div>${expHTML}</div>` : ''}
+          ${eduHTML ? `<div class="cv-sec"><div class="cv-sec-title">Education</div>${eduHTML}</div>` : ''}
+          ${projHTML ? `<div class="cv-sec"><div class="cv-sec-title">Projects</div>${projHTML}</div>` : ''}
+          <div class="cv-sign">
+            <div>Date: ${today}</div>
+            <div>Signature: ___________</div>
+          </div>
+        </div>
+        <div class="cv-side">
+          ${skills.length ? `<div class="cv-side-sec"><div class="cv-side-title">Skills</div><div class="cv-skills">${skills.map(s=>`<div class="cv-skill">${s}</div>`).join('')}</div></div>` : ''}
+          ${languages ? `<div class="cv-side-sec"><div class="cv-side-title">Languages</div><div class="cv-side-text">${languages}</div></div>` : ''}
+          ${achHTML ? `<div class="cv-side-sec"><div class="cv-side-title">Achievements</div>${achHTML}</div>` : ''}
+        </div>
+      </div>`;
+
+    document.getElementById('form-page').style.display = 'none';
+    document.getElementById('cv-page').style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+
+  function editCV() {
+    document.getElementById('form-page').style.display = 'block';
+    document.getElementById('cv-page').style.display = 'none';
+    window.scrollTo(0, 0);
+  }
+</script>
+</body>
+</html>
